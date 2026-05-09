@@ -45,7 +45,7 @@ def ai_advice():
         return jsonify({"error": "No appliances added yet. Add your appliances first."}), 400
 
     appliance_list = "\n".join([
-        f"- {a['name']}: {a['watts']}W, used {a['hours_per_day']} hours/day, consuming {a['daily_kwh']} kWh/day"
+        f"- {a['name']} (x{a.get('quantity', 1)}): {a['watts']}W, {a['usage_level']} user, {a['hours_per_day']} hours/day, consuming {a['daily_kwh']} kWh/day"
         for a in appliances
     ])
 
@@ -89,3 +89,45 @@ Keep your response friendly, clear, and practical. Use simple language."""
     except Exception as e:
         print("AI Error:", str(e))
         return jsonify({"error": str(e)}), 500
+
+
+@predict_bp.route('/admin/stats', methods=['GET'])
+def admin_stats():
+    secret = request.args.get('key')
+    if secret != 'energyadmin2026':
+        return jsonify({"error": "Unauthorized"}), 401
+
+    from config import db
+    from models.units_model import appliances_collection
+
+    users = list(db['users'].find({}, {'password': 0}))
+    appliances = list(db['appliances'].find({}))
+    logs = list(db['units_log'].find({}))
+
+    formatted_users = []
+    for u in users:
+        user_id = str(u['_id'])
+        user_apps = [a for a in appliances if a['user_id'] == user_id]
+        user_logs = [l for l in logs if l['user_id'] == user_id]
+        formatted_users.append({
+            "id": user_id,
+            "name": u.get('name', ''),
+            "email": u.get('email', ''),
+            "registered": u.get('created_at', '').isoformat() if u.get('created_at') else 'N/A',
+            "appliance_count": len(user_apps),
+            "log_count": len(user_logs),
+        })
+
+    appliance_names = [a['name'] for a in appliances]
+    appliance_counts = {}
+    for name in appliance_names:
+        appliance_counts[name] = appliance_counts.get(name, 0) + 1
+    top_appliances = sorted(appliance_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    return jsonify({
+        "total_users": len(users),
+        "total_appliances": len(appliances),
+        "total_logs": len(logs),
+        "users": formatted_users,
+        "top_appliances": [{"name": k, "count": v} for k, v in top_appliances]
+    }), 200
