@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EnergyPredict</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">EnergyPredict</a>
+        <div>
+            <span id="welcome-name" style="color:white; margin-right:15px;"></span>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>My Dashboard</h2>
+        </div>
+
+        <div class="card">
+            <h3>My Appliances</h3>
+            <p style="color:#666; font-size:14px; margin-bottom:15px;">Add the appliances in your home. Start typing to get suggestions, or enter a custom appliance.</p>
+
+            <div class="form-row">
+                <div class="form-group" style="position:relative;">
+                    <label>Appliance Name</label>
+                    <input type="text" id="appliance-name" placeholder="e.g. Television" autocomplete="off" oninput="fetchSuggestions()" onblur="hideSuggestions()">
+                    <div id="suggestions-box" style="
+                        display:none;
+                        position:absolute;
+                        top:100%;
+                        left:0;
+                        right:0;
+                        background:white;
+                        border:1px solid #ccc;
+                        border-radius:0 0 6px 6px;
+                        z-index:1000;
+                        max-height:220px;
+                        overflow-y:auto;
+                        box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                    "></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="appliance-quantity" placeholder="e.g. 2" min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label>Power (Watts)</label>
+                    <input type="number" id="appliance-watts" placeholder="Auto-filled or enter manually">
+                </div>
+
+                <div class="form-group">
+                    <label>Usage Level</label>
+                    <select id="appliance-usage" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:15px;">
+                        <option value="">Select usage level</option>
+                        <option value="Light">Light</option>
+                        <option value="Average">Average</option>
+                        <option value="Heavy">Heavy</option>
+                    </select>
+                    <small id="usage-hint" style="color:#888; font-size:12px; margin-top:4px; display:block;"></small>
+                </div>
+            </div>
+
+            <button class="btn btn-green" onclick="addAppliance()">Add Appliance</button>
+            <div id="appliance-message"></div>
+
+            <div id="appliances-list" style="margin-top:20px;"></div>
+            <div id="total-consumption" style="margin-top:10px; font-weight:bold; color:#1a6b3c;"></div>
+        </div>
+
+        <div class="card">
+            <h3>Log Energy Units</h3>
+            <p style="color:#666; font-size:14px; margin-bottom:15px;">Record when you buy units or when they finish.</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="log-type" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                        <option value="bought">Bought Units</option>
+                        <option value="finished">Units Finished</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (kWh)</label>
+                    <input type="number" id="log-amount" placeholder="e.g. 50">
+                </div>
+                <div class="form-group">
+                    <label>Note (optional)</label>
+                    <input type="text" id="log-note" placeholder="e.g. Monthly recharge">
+                </div>
+            </div>
+            <button class="btn btn-green" onclick="addLog()">Add Log</button>
+            <div id="log-message"></div>
+        </div>
+
+        <div class="card">
+            <h3>How Long Will My Units Last?</h3>
+            <p style="color:#666; font-size:14px; margin-bottom:15px;">Enter how many units you have and we will predict how many days they will last based on your appliances.</p>
+            <div class="form-group" style="max-width:300px;">
+                <label>Units Available (kWh)</label>
+                <input type="number" id="units-bought" placeholder="e.g. 50">
+            </div>
+            <button class="btn btn-green" style="max-width:300px;" onclick="predict()">Predict</button>
+            <div id="prediction-result"></div>
+        </div>
+
+        <div class="card">
+            <h3>AI Energy Advisor</h3>
+            <p style="color:#666; font-size:14px; margin-bottom:15px;">Get personalized energy saving tips based on your appliances.</p>
+            <button class="btn btn-green" style="max-width:300px;" onclick="getAIAdvice()">Get AI Advice</button>
+            <div id="ai-advice-result" style="margin-top:20px; line-height:1.8; color:#333;"></div>
+        </div>
+
+        <div class="card">
+            <h3>Units Log History</h3>
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Amount (kWh)</th>
+                        <th>Note</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="log-tbody">
+                    <tr><td colspan="4" style="text-align:center; padding:20px;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Units Purchase History</h3>
+            <canvas id="consumptionChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <footer>
+        <p>EnergyPredict &copy; 2026. Built with Machine Learning.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
