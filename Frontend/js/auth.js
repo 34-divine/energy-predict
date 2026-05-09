@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:5000/api';
+const API_URL = 'https://energy-predict-backend.onrender.com/api';
 
 async function register() {
     const name = document.getElementById('name').value;
