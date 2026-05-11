@@ -93,7 +93,7 @@ function updateUsageHint() {
         return;
     }
 
-    hint.textContent = `${level} user (${USAGE_RANGES[level]}) — using ${USAGE_MIDPOINTS[level]} hrs/day for calculation`;
+    hint.textContent = `${level} user (${USAGE_RANGES[level]})`;
 }
 
 function getHoursFromLevel(level) {
