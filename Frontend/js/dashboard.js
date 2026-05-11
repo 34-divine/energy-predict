@@ -12,6 +12,9 @@ function logout() {
 let currentHoursMap = null;
 window._suggestions = [];
 
+const USAGE_RANGES = { Light: '0 - 5 hours/day', Average: '5 - 10 hours/day', Heavy: '10 - 24 hours/day' };
+const USAGE_MIDPOINTS = { Light: 2.5, Average: 7.5, Heavy: 17 };
+
 window.onload = function () {
     const token = getToken();
     if (!token) {
@@ -90,23 +93,11 @@ function updateUsageHint() {
         return;
     }
 
-    console.log('currentHoursMap:', currentHoursMap);
-    console.log('level:', level);
-
-    if (currentHoursMap && currentHoursMap[level] !== undefined) {
-        const hrs = currentHoursMap[level];
-        hint.textContent = `${level} = approximately ${hrs} hour${hrs !== 1 ? 's' : ''} per day`;
-    } else {
-        const defaults = { Light: 2, Average: 5, Heavy: 8 };
-        hint.textContent = `${level} = approximately ${defaults[level]} hours per day`;
-    }
+    hint.textContent = `${level} user (${USAGE_RANGES[level]}) — using ${USAGE_MIDPOINTS[level]} hrs/day for calculation`;
 }
+
 function getHoursFromLevel(level) {
-    if (currentHoursMap && currentHoursMap[level] !== undefined) {
-        return currentHoursMap[level];
-    }
-    const defaults = { Light: 2, Average: 5, Heavy: 8 };
-    return defaults[level];
+    return USAGE_MIDPOINTS[level] || 2.5;
 }
 
 // ─── ADD APPLIANCE ─────────────────────────────────────────────────────────────
